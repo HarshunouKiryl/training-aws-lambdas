@@ -54,10 +54,9 @@ public class Handler implements RequestHandler<S3Event, String> {
                 if (doc.getDocumentElement().getNodeName().equals("books")) {
                     books = parseBookList(doc);
                 }
-            } catch (ParserConfigurationException e) {
+            } catch (ParserConfigurationException | SAXException e) {
+                logger.error(e.getMessage());
                 throw new RuntimeException(e);
-            } catch (SAXException e) {
-                e.printStackTrace();
             }
             AmazonDynamoDB client = AmazonDynamoDBClientBuilder.defaultClient();
             if (books != null && books.size() > 0) {
@@ -80,6 +79,7 @@ public class Handler implements RequestHandler<S3Event, String> {
                     + srcKey + " and no books were detected");
             return "Ok";
         } catch (IOException e) {
+            logger.error(e.getMessage());
             throw new RuntimeException(e);
         }
     }
